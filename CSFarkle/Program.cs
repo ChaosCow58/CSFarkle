@@ -3,6 +3,7 @@
     internal class Program
     {
         private static Dice dice = new Dice();
+        private static PointChecker pointChecker = new PointChecker();
         private static string userInput = string.Empty;
         private static int numberOfPlayers = 1;
         private static readonly List<Player> playerList = [];
@@ -28,10 +29,11 @@
 
             while (true)
             {
-                for (int i = 0;i < numberOfPlayers; i++)
+                foreach (Player player in playerList)
                 {
-                    Console.WriteLine($"Player {playerList[i].PlayerNum}:");
-                    Console.WriteLine($"Points: {playerList[i].Points}\n");
+                    Console.WriteLine($"Player {player.PlayerNum}:");
+                    Console.WriteLine($"Points: {player.Points}");
+                    Console.WriteLine($"Running Total: {player.Points}\n");
 
                     rollDice:
                     try
@@ -42,7 +44,9 @@
                         if (userInput == "y")
                         {
                             dice.RollDice();
+                            Console.WriteLine("\nRolled Dice:");
                             Console.WriteLine(dice.GetDiceValues());
+                            pointChecker.CheckDice(dice.GetDiceValues());
                         }
                         else
                         {
