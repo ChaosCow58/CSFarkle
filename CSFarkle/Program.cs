@@ -33,7 +33,7 @@
                 {
                     Console.WriteLine($"Player {player.PlayerNum}:");
                     Console.WriteLine($"Points: {player.Points}");
-                    Console.WriteLine($"Running Total: {player.Points}\n");
+                    Console.WriteLine($"Running Total: {player.RunningTotal}\n");
 
                     rollDice:
                     try
