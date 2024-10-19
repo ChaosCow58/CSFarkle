@@ -46,7 +46,7 @@
                             dice.RollDice();
                             Console.WriteLine("\nRolled Dice:");
                             Console.WriteLine(dice.GetDiceValues());
-                            pointChecker.CheckDice(dice.GetDiceValues());
+                            goto checkDice;
                         }
                         else
                         {
@@ -57,6 +57,26 @@
                     {
                         goto rollDice;
                     }    
+
+                    checkDice:
+                    try
+                    {
+                        Dictionary<string, int> options = pointChecker.CheckDice(dice.GetDiceValues());
+                        foreach (string option in options.Keys)
+                        {
+                            Console.Write(option);
+                        }
+                        userInput = Console.ReadLine();
+                        string selectedOptionKey = options.Keys.FirstOrDefault(option => option.StartsWith(userInput + ")"));
+                        player.RunningTotal += options[selectedOptionKey];
+                        Console.WriteLine($"Running Total: {player.RunningTotal}");
+                        Console.ReadKey();
+
+                    }
+                    catch 
+                    { 
+                        goto checkDice; 
+                    }
                 }
                 break;
             }
