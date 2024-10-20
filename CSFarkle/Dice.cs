@@ -9,7 +9,6 @@ namespace CSFarkle
     public class Dice
     {
        private List<int> DiceValues { get; set; } = [];
-       private List<int> StoredValues { get; set; } = [];
        private Random random = new Random();
 
        public Dice() { }
@@ -52,38 +51,6 @@ namespace CSFarkle
         public void ClearDiceValues()
         {
             DiceValues.Clear();
-        }
-
-        public string GetStoredValues()
-        {
-            string val = "[";
-            for (int i = 0; i < StoredValues.Count; i++)
-            {
-                if (i != StoredValues.Count - 1)
-                {
-                    val += StoredValues[i] + ", ";
-                }
-                else
-                {
-                    val += StoredValues[i] + "]";
-                }
-            }
-            return val;
-        }
-
-        public void AddStoredValue(int value)
-        {
-            StoredValues.Add(value);
-        }
-
-        public void DeleteStoredValue(int value)
-        {
-            StoredValues.Remove(value);
-        }
-
-        public void ClearStoredValues()
-        {
-            StoredValues.Clear();
         }
     }
 }

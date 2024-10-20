@@ -31,22 +31,48 @@
             {
                 foreach (Player player in playerList)
                 {
+                    int numOfDice = 6;
+                    bool firstRoll = true;
+
+                    if (player.Points >= 10_000)
+                    {
+                        Console.WriteLine($"Player {player.PlayerNum} wins! With {player.Points.ToString("N0")} points!");
+                        goto exit;
+                    }
+
                     Console.WriteLine($"Player {player.PlayerNum}:");
                     Console.WriteLine($"Points: {player.Points}");
-                    Console.WriteLine($"Running Total: {player.RunningTotal}\n");
+                    Console.WriteLine($"Running Total: {player.RunningTotal}");
 
                     rollDice:
                     try
                     {
+                        Console.WriteLine($"\nDice can be rolled: {numOfDice}");
                         Console.WriteLine("Roll Dice? Y/N");
                         userInput = Console.ReadKey().KeyChar.ToString().ToLower();
                         
                         if (userInput == "y")
                         {
-                            dice.RollDice();
+                            dice.RollDice(numOfDice);
                             Console.WriteLine("\nRolled Dice:");
                             Console.WriteLine(dice.GetDiceValues());
+                            firstRoll = false;
                             goto checkDice;
+                        }
+                        else if (!firstRoll)
+                        {
+                            if (player.RunningTotal < 500 && player.Points < 500)
+                            {
+                                Console.WriteLine("\nYou must have 500 points to be on the score board!");
+                                Console.ReadKey();
+                            }
+                            else
+                            {
+                                player.Points += player.RunningTotal;
+                            }
+                            player.RunningTotal = 0;
+                            Console.Clear();
+                            continue;
                         }
                         else
                         {
@@ -61,16 +87,40 @@
                     checkDice:
                     try
                     {
-                        Dictionary<string, int> options = pointChecker.CheckDice(dice.GetDiceValues());
+                        Dictionary<string, (int points, List<int> diceToSave)> options = pointChecker.CheckDice(dice.GetDiceValues());
                         foreach (string option in options.Keys)
                         {
                             Console.Write(option);
                         }
                         userInput = Console.ReadLine();
-                        string selectedOptionKey = options.Keys.FirstOrDefault(option => option.StartsWith(userInput + ")"));
-                        player.RunningTotal += options[selectedOptionKey];
+                        (int score, List<int> diceToSave) pointsScored = options.ElementAt(int.Parse(userInput) - 1).Value;
+                        if (pointsScored.score == 0)
+                        {
+                            player.RunningTotal = 0;
+                            dice.ClearDiceValues();
+                            Console.WriteLine("Farkle!");
+                            Console.ReadKey();
+                            Console.Clear();
+                            continue;
+                        }
+                        player.RunningTotal += pointsScored.score;
+
+                        numOfDice -= pointsScored.diceToSave.Count;
+                        if (numOfDice <= 0)
+                        {
+                            Console.WriteLine("You can roll all 6 dice again!");
+                            numOfDice = 6;
+                        }
+                        dice.ClearDiceValues();
+
                         Console.WriteLine($"Running Total: {player.RunningTotal}");
                         Console.ReadKey();
+                        Console.Clear();
+
+                        Console.WriteLine($"Player {player.PlayerNum}:");
+                        Console.WriteLine($"Points: {player.Points}");
+                        Console.WriteLine($"Running Total: {player.RunningTotal}");
+                        goto rollDice;
 
                     }
                     catch 
@@ -78,12 +128,12 @@
                         goto checkDice; 
                     }
                 }
-                break;
             }
 
-
-           //dice.RollDice();
-           //Console.WriteLine(dice.GetDiceValues());
+            exit:
+            Console.WriteLine("Press any key to exit...");
+            Console.ReadKey();
+           
         }
     }
 }
