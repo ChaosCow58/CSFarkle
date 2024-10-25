@@ -63,7 +63,7 @@ namespace CSFarkle
                 }
                 if (number == 1 && (count >= 1 && count <= 2)) 
                 {
-                    result.Add($"{option}) Save an 1\n", (100, diceToSave.Take(1).ToList()));
+                    result.Add($"{option}) Save a 1\n", (100, diceToSave.Take(1).ToList()));
                     option++;  
                 }
                 if (number == 5 && count == 2)
@@ -73,7 +73,7 @@ namespace CSFarkle
                 }
                 if (number == 5 && (count >= 1 && count <= 2)) 
                 {  
-                    result.Add($"{option}) Save an 5\n", (50, diceToSave.Take(1).ToList()));
+                    result.Add($"{option}) Save a 5\n", (50, diceToSave.Take(1).ToList()));
                     option++;   
                 }
                 if (count == 3)
