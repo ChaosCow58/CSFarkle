@@ -6,16 +6,11 @@ using System.Threading.Tasks;
 
 namespace CSFarkle
 {
-    public class Player
+    public class Player(int playerNum)
     {
         public int Points { get; set; }
         public int RunningTotal { get; set; }
         public bool HasOneChance { get; set; } = false;
-        public int PlayerNum { get; }
-
-        public Player(int playerNum) 
-        { 
-            this.PlayerNum = playerNum;
-        }
+        public int PlayerNum { get; } = playerNum;
     }
 }

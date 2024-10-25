@@ -1,9 +1,10 @@
 ﻿namespace CSFarkle
 {
+#pragma warning disable CS8604
+#pragma warning disable CS8601
     internal class Program
     {
         private static Dice dice = new Dice();
-        private static PointChecker pointChecker = new PointChecker();
         private static string userInput = string.Empty;
         private static int numberOfPlayers = 1;
         private static readonly List<Player> playerList = [];
@@ -36,13 +37,21 @@
 
                     if (player.Points >= 10_000)
                     {
-                        Console.WriteLine($"Player {player.PlayerNum} wins! With {player.Points.ToString("N0")} points!");
+                        Console.WriteLine($"Player {player.PlayerNum} wins! With {player.Points:N0} points!");
                         goto exit;
                     }
 
-                    Console.WriteLine($"Player {player.PlayerNum}:");
-                    Console.WriteLine($"Points: {player.Points}");
-                    Console.WriteLine($"Running Total: {player.RunningTotal}");
+                    for (int i = 0; i < playerList.Count; i++)
+                    {
+                        if (playerList[i].PlayerNum != player.PlayerNum)
+                        {
+                            Console.WriteLine($"Player {playerList[i].PlayerNum}: {playerList[i].Points:N0}");
+                        }
+                    }
+
+                    Console.WriteLine($"\nPlayer {player.PlayerNum}:");
+                    Console.WriteLine($"Points: {player.Points:N0}");
+                    Console.WriteLine($"Running Total: {player.RunningTotal:N0}");
 
                     rollDice:
                     try
@@ -87,14 +96,14 @@
                     checkDice:
                     try
                     {
-                        Dictionary<string, (int points, List<int> diceToSave)> options = pointChecker.CheckDice(dice.GetDiceValues());
+                        Dictionary<string, (int points, List<int> diceToSave)> options = PointChecker.CheckDice(dice.GetDiceValues());
                         foreach (string option in options.Keys)
                         {
                             Console.Write(option);
                         }
                         userInput = Console.ReadLine();
-                        (int score, List<int> diceToSave) pointsScored = options.ElementAt(int.Parse(userInput) - 1).Value;
-                        if (pointsScored.score == 0)
+                        (int score, List<int> diceToSave) = options.ElementAt(int.Parse(userInput) - 1).Value;
+                        if (score == 0)
                         {
                             player.RunningTotal = 0;
                             dice.ClearDiceValues();
@@ -103,9 +112,9 @@
                             Console.Clear();
                             continue;
                         }
-                        player.RunningTotal += pointsScored.score;
+                        player.RunningTotal += score;
 
-                        numOfDice -= pointsScored.diceToSave.Count;
+                        numOfDice -= diceToSave.Count;
                         if (numOfDice <= 0)
                         {
                             Console.WriteLine("You can roll all 6 dice again!");
@@ -113,13 +122,20 @@
                         }
                         dice.ClearDiceValues();
 
-                        Console.WriteLine($"Running Total: {player.RunningTotal}");
+                        Console.WriteLine($"Running Total: {player.RunningTotal:N0}");
                         Console.ReadKey();
                         Console.Clear();
 
-                        Console.WriteLine($"Player {player.PlayerNum}:");
-                        Console.WriteLine($"Points: {player.Points}");
-                        Console.WriteLine($"Running Total: {player.RunningTotal}");
+                        for (int i = 0; i < playerList.Count; i++)
+                        {
+                            if (playerList[i].PlayerNum != player.PlayerNum)
+                            {
+                                Console.WriteLine($"Player {playerList[i].PlayerNum}: {playerList[i].Points:N0}");
+                            }
+                        }
+                        Console.WriteLine($"\nPlayer {player.PlayerNum}:");
+                        Console.WriteLine($"Points: {player.Points:N0}");
+                        Console.WriteLine($"Running Total: {player.RunningTotal:N0}");
                         goto rollDice;
 
                     }

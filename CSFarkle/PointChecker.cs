@@ -11,7 +11,7 @@ namespace CSFarkle
         public PointChecker() { }
 
         // Option, Points, Dice to save
-        public Dictionary<string, (int points, List<int> diceToSave)> CheckDice(string diceValues)
+        public static Dictionary<string, (int points, List<int> diceToSave)> CheckDice(string diceValues)
         {
             Dictionary<string, (int points, List<int> diceToSave)> result = [];
             List<int> numbers = diceValues
@@ -29,7 +29,7 @@ namespace CSFarkle
             int numOfTriplets = 0;
             bool isStraight = true;
 
-            for (int i = 1;i <= 6;i++)
+            for (int i = 1; i <= 6; i++)
             {
                 if (!numberCounts.ContainsKey(i))
                 {
