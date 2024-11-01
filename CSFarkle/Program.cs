@@ -6,12 +6,14 @@ namespace CSFarkle
 #pragma warning disable CS8601
     internal class Program
     {
-        private static Dice dice = new Dice();
         private static string userInput = string.Empty;
+
+        private static readonly Dice dice = new Dice();
         private static readonly List<Player> playerList = [];
-        private static readonly ColumnHeader[] columnHeaders = [new ColumnHeader("Player #"), new ColumnHeader("Points"), new ColumnHeader("# of Turns")];
-        private static readonly TableConfiguration tableConfiguration = TableConfiguration.Unicode();
+
         private static Table? scoreTable;
+        private static readonly TableConfiguration tableConfiguration = TableConfiguration.Unicode();
+        private static readonly ColumnHeader[] columnHeaders = [new ColumnHeader("Player #"), new ColumnHeader("Points"), new ColumnHeader("# of Turns")];
 
         static void Main(string[] args)
         {
@@ -59,6 +61,10 @@ namespace CSFarkle
 
                     Console.Write(scoreTable);
 
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("\nExit Game (e)");
+                    Console.ForegroundColor = ConsoleColor.White;
+
                     Console.WriteLine($"\nPlayer {player.PlayerNum}:");
                     Console.WriteLine($"Turn: {player.NumOfTurns + 1}");
                     Console.WriteLine($"Points: {player.Points:N0}");
@@ -79,7 +85,7 @@ namespace CSFarkle
                             firstRoll = false;
                             goto checkDice;
                         }
-                        else if (!firstRoll)
+                        else if (!firstRoll && userInput == "n")
                         {
                             if (player.RunningTotal < 500 && player.Points < 500)
                             {
@@ -93,6 +99,10 @@ namespace CSFarkle
                             Console.Clear();
                             Reset(player);
                             continue;
+                        }
+                        else if (userInput == "e")
+                        {
+                            Exit();
                         }
                         else
                         {
@@ -137,12 +147,10 @@ namespace CSFarkle
                         if (numOfDice <= 0)
                         {
                             Console.WriteLine("You can roll all 6 dice again!");
+                            Console.ReadKey();
                             numOfDice = 6;
                         }
                         dice.ClearDiceValues();
-
-                        Console.WriteLine($"Running Total: {player.RunningTotal:N0}");
-                        Console.ReadKey();
                         Console.Clear();
 
                         goto begin;
@@ -158,7 +166,7 @@ namespace CSFarkle
         exit:
             Console.WriteLine("Press any key to exit...");
             Console.ReadKey();
-
+            Exit();
         }
 
         private static void Reset(Player player)
@@ -166,6 +174,11 @@ namespace CSFarkle
             player.RunningTotal = 0;
             dice.ClearDiceValues();
             player.NumOfTurns++;
+        }
+
+        private static void Exit(int statusCode = 0)
+        {
+            Environment.Exit(statusCode);
         }
     }
 }
