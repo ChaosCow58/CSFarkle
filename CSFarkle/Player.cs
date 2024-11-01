@@ -12,5 +12,7 @@ namespace CSFarkle
         public int RunningTotal { get; set; }
         public bool HasOneChance { get; set; } = false;
         public int PlayerNum { get; } = playerNum;
+
+        public int NumOfTurns { get; set; } = 0;
     }
 }

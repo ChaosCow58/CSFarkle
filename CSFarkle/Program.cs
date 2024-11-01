@@ -1,4 +1,6 @@
-﻿namespace CSFarkle
+﻿using BetterConsoleTables;
+
+namespace CSFarkle
 {
 #pragma warning disable CS8604
 #pragma warning disable CS8601
@@ -6,22 +8,24 @@
     {
         private static Dice dice = new Dice();
         private static string userInput = string.Empty;
-        private static int numberOfPlayers = 1;
         private static readonly List<Player> playerList = [];
+        private static readonly ColumnHeader[] columnHeaders = [new ColumnHeader("Player #"), new ColumnHeader("Points"), new ColumnHeader("# of Turns")];
+        private static readonly TableConfiguration tableConfiguration = TableConfiguration.Unicode();
+        private static Table? scoreTable;
 
         static void Main(string[] args)
         {
-            numberOfPlayers:
+        numberOfPlayers:
             Console.WriteLine("How many players are playing?");
             try
             {
-                numberOfPlayers = int.Parse(Console.ReadLine());
-                for (int i = 0;i < numberOfPlayers; i++)
+                int numberOfPlayers = int.Parse(Console.ReadLine());
+                for (int i = 0; i < numberOfPlayers; i++)
                 {
                     playerList.Add(new Player(i + 1));
-                }  
+                }
             }
-            catch 
+            catch
             {
                 goto numberOfPlayers;
             }
@@ -41,25 +45,32 @@
                         goto exit;
                     }
 
+                begin:
+
+                    scoreTable = new Table(tableConfiguration, columnHeaders);
+
                     for (int i = 0; i < playerList.Count; i++)
                     {
                         if (playerList[i].PlayerNum != player.PlayerNum)
                         {
-                            Console.WriteLine($"Player {playerList[i].PlayerNum}: {playerList[i].Points:N0}");
+                            scoreTable.AddRow($"{playerList[i].PlayerNum}", playerList[i].Points.ToString("N0"), playerList[i].NumOfTurns);
                         }
                     }
 
+                    Console.Write(scoreTable);
+
                     Console.WriteLine($"\nPlayer {player.PlayerNum}:");
+                    Console.WriteLine($"Turn: {player.NumOfTurns + 1}");
                     Console.WriteLine($"Points: {player.Points:N0}");
                     Console.WriteLine($"Running Total: {player.RunningTotal:N0}");
 
-                    rollDice:
+                rollDice:
                     try
                     {
                         Console.WriteLine($"\nDice can be rolled: {numOfDice}");
                         Console.WriteLine("Roll Dice? Y/N");
                         userInput = Console.ReadKey().KeyChar.ToString().ToLower();
-                        
+
                         if (userInput == "y")
                         {
                             dice.RollDice(numOfDice);
@@ -79,8 +90,8 @@
                             {
                                 player.Points += player.RunningTotal;
                             }
-                            player.RunningTotal = 0;
                             Console.Clear();
+                            Reset(player);
                             continue;
                         }
                         else
@@ -88,33 +99,41 @@
                             goto rollDice;
                         }
                     }
-                    catch 
+                    catch
                     {
                         goto rollDice;
-                    }    
+                    }
 
-                    checkDice:
+                checkDice:
                     try
                     {
-                        Dictionary<string, (int points, List<int> diceToSave)> options = PointChecker.CheckDice(dice.GetDiceValues());
+                        Dictionary<string, (int score, List<int> diceToSave)> options = PointChecker.CheckDice(dice.GetDiceValues());
                         foreach (string option in options.Keys)
                         {
+                            if (option.Contains("No Matches"))
+                            {
+                                Reset(player);
+                                Console.WriteLine("Farkle!");
+                                Console.ReadKey();
+                                Console.Clear();
+                                break;
+                            }
                             Console.Write(option);
                         }
-                        userInput = Console.ReadLine();
-                        (int score, List<int> diceToSave) = options.ElementAt(int.Parse(userInput) - 1).Value;
-                        if (score == 0)
+
+                        if (options.ElementAt(0).Value.score == 0)
                         {
-                            player.RunningTotal = 0;
-                            dice.ClearDiceValues();
-                            Console.WriteLine("Farkle!");
-                            Console.ReadKey();
-                            Console.Clear();
                             continue;
                         }
+
+                        userInput = Console.ReadLine();
+
+                        (int score, List<int> diceToSave) = options.ElementAt(int.Parse(userInput) - 1).Value;
+
                         player.RunningTotal += score;
 
                         numOfDice -= diceToSave.Count;
+
                         if (numOfDice <= 0)
                         {
                             Console.WriteLine("You can roll all 6 dice again!");
@@ -126,30 +145,27 @@
                         Console.ReadKey();
                         Console.Clear();
 
-                        for (int i = 0; i < playerList.Count; i++)
-                        {
-                            if (playerList[i].PlayerNum != player.PlayerNum)
-                            {
-                                Console.WriteLine($"Player {playerList[i].PlayerNum}: {playerList[i].Points:N0}");
-                            }
-                        }
-                        Console.WriteLine($"\nPlayer {player.PlayerNum}:");
-                        Console.WriteLine($"Points: {player.Points:N0}");
-                        Console.WriteLine($"Running Total: {player.RunningTotal:N0}");
-                        goto rollDice;
+                        goto begin;
 
                     }
-                    catch 
-                    { 
-                        goto checkDice; 
+                    catch
+                    {
+                        goto checkDice;
                     }
                 }
             }
 
-            exit:
+        exit:
             Console.WriteLine("Press any key to exit...");
             Console.ReadKey();
-           
+
+        }
+
+        private static void Reset(Player player)
+        {
+            player.RunningTotal = 0;
+            dice.ClearDiceValues();
+            player.NumOfTurns++;
         }
     }
 }
