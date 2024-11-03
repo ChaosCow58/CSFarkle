@@ -15,6 +15,7 @@ namespace CSFarkle
 
         public void RollDice(int numberOfDice = 6) 
         {
+            DiceValues.Capacity = numberOfDice;
             for (int i = 0; i < numberOfDice; i++)
             {
                 DiceValues.Add(random.Next(1, 7));
@@ -23,19 +24,7 @@ namespace CSFarkle
 
         public string GetDiceValues() 
         {
-            string val = "[";
-            for (int i = 0;i < DiceValues.Count;i++) 
-            { 
-                if (i != DiceValues.Count - 1) 
-                { 
-                    val += DiceValues[i] + ", ";
-                }
-                else
-                {
-                    val += DiceValues[i] + "]";
-                }
-            }
-            return val;
+            return $"[{string.Join(", ", DiceValues)}]";
         }
 
         public void AddDiceValue(int value)
